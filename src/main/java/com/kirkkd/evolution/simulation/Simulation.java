@@ -1,17 +1,14 @@
 package com.kirkkd.evolution.simulation;
 
 import com.kirkkd.evolution.rendering.Camera;
-import com.kirkkd.evolution.simulation.genotype.*;
-import com.kirkkd.evolution.simulation.genotype.mutation.CompositeMutationStrategy;
-import com.kirkkd.evolution.simulation.genotype.mutation.GaussianPerturbationMutationStrategy;
-import com.kirkkd.evolution.simulation.genotype.mutation.RandomResetMutationStrategy;
-import com.kirkkd.evolution.simulation.organism.Cell;
+import com.kirkkd.evolution.simulation.genotype.Genome;
+import com.kirkkd.evolution.simulation.phenotype.NeuralNetwork;
 import com.kirkkd.evolution.util.Vec2f;
 import com.kirkkd.evolution.window.Keyboard;
 import com.kirkkd.evolution.window.IUpdateAction;
 import com.kirkkd.evolution.window.Window;
 
-import java.util.List;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -38,23 +35,10 @@ public class Simulation implements IUpdateAction {
         window.SCREEN_SPACE_RENDER_ACTIONS.add(this::renderScreenSpace);
 
         // TEMPORARY TESTING CODE
-        for (int i = 0; i < 1; i++) {
-            List<String> chromIds = List.of("Chr1", "Chr2", "Chr3", "Chr4");
-            Genome genome = GenomeFactory.createRandomGenome(
-                    chromIds,
-                    Gene.locusSpecs()
-            );
-            Cell c = new Cell(genome);
-
-            System.out.println("Original " + i + " " + c);
-
-            for (int j = 0; j < 200; j++) {
-                c = c.mitosis(new CompositeMutationStrategy(
-                        new GaussianPerturbationMutationStrategy(10, 0.01),
-                        new RandomResetMutationStrategy(0.001)
-                ));
-            }
-        }
+        Genome g = Genome.generateRandomGenome(1, 1, 2);
+        System.out.println(g);
+        NeuralNetwork n = new NeuralNetwork(g);
+        System.out.println(Arrays.toString(n.activate(new double[]{4.2})));
     }
 
     @Override
