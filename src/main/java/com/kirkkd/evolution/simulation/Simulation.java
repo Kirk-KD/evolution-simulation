@@ -1,19 +1,16 @@
 package com.kirkkd.evolution.simulation;
 
 import com.kirkkd.evolution.rendering.Camera;
-import com.kirkkd.evolution.simulation.genotype.Genome;
-import com.kirkkd.evolution.simulation.phenotype.NeuralNetwork;
-import com.kirkkd.evolution.util.Vec2f;
+import com.kirkkd.evolution.simulation.phenotype.cell.Cell;
+import com.kirkkd.evolution.util.Vec2d;
 import com.kirkkd.evolution.window.Keyboard;
 import com.kirkkd.evolution.window.IUpdateAction;
 import com.kirkkd.evolution.window.Window;
 
-import java.util.Arrays;
-
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Simulation implements IUpdateAction {
-    private static final float CAMERA_SPEED = 100f;
+    private static final double CAMERA_SPEED = 100f;
 
     private static Simulation instance;
 
@@ -25,8 +22,12 @@ public class Simulation implements IUpdateAction {
         instance = new Simulation();
     }
 
-    private long lastTime;
-    private float deltaTime;
+    private long lastTime = -1;
+    private double deltaTime = 0;
+
+    public double getDeltaTime() {
+        return deltaTime;
+    }
 
     protected Simulation() {
         Window window = Window.getInstance();
@@ -35,10 +36,8 @@ public class Simulation implements IUpdateAction {
         window.SCREEN_SPACE_RENDER_ACTIONS.add(this::renderScreenSpace);
 
         // TEMPORARY TESTING CODE
-        Genome g = Genome.generateRandomGenome(1, 1, 2);
-        System.out.println(g);
-        NeuralNetwork n = new NeuralNetwork(g);
-        System.out.println(Arrays.toString(n.activate(new double[]{4.2})));
+        Cell.spawn(new Vec2d(200, 200));
+        Cell.spawn(new Vec2d(700, 700));
     }
 
     @Override
@@ -56,22 +55,19 @@ public class Simulation implements IUpdateAction {
     }
 
     private void updateCamera() {
-        Vec2f direction = Vec2f.zero();
+        Vec2d direction = Vec2d.zero();
 
-        if (Keyboard.isKeyDown(GLFW_KEY_W)) direction.addInPlace(new Vec2f(0, -1));
-        if (Keyboard.isKeyDown(GLFW_KEY_S)) direction.addInPlace(new Vec2f(0, 1));
-        if (Keyboard.isKeyDown(GLFW_KEY_A)) direction.addInPlace(new Vec2f(-1, 0));
-        if (Keyboard.isKeyDown(GLFW_KEY_D)) direction.addInPlace(new Vec2f(1, 0));
+        if (Keyboard.isKeyDown(GLFW_KEY_W)) direction = direction.add(new Vec2d(0, -1));
+        if (Keyboard.isKeyDown(GLFW_KEY_S)) direction = direction.add(new Vec2d(0, 1));
+        if (Keyboard.isKeyDown(GLFW_KEY_A)) direction = direction.add(new Vec2d(-1, 0));
+        if (Keyboard.isKeyDown(GLFW_KEY_D)) direction = direction.add(new Vec2d(1, 0));
 
-        direction.normalizeInPlace();
-        direction.multiplyInPlace(CAMERA_SPEED * deltaTime);
-
-        Camera.getInstance().setDeltaPosition(direction);
+        Camera.getInstance().setDeltaPosition(direction.normalize().multiply(CAMERA_SPEED * deltaTime));
     }
 
     private void updateDeltaTime() {
         long currentTime = System.nanoTime();
-        deltaTime = (currentTime - lastTime) / 1000000000.0f;
+        deltaTime = (currentTime - (lastTime == -1 ? currentTime : lastTime)) / 1000000000.0;
         lastTime = currentTime;
     }
 }

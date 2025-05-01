@@ -1,6 +1,6 @@
 package com.kirkkd.evolution.simulation.genotype;
 
-public class ConnectionGene {
+public class ConnectionGene extends Gene {
     int from;
 
     public int getFrom() {
@@ -17,12 +17,6 @@ public class ConnectionGene {
 
     public double getWeight() {
         return weight;
-    }
-
-    boolean enabled;
-
-    public boolean isEnabled() {
-        return enabled;
     }
 
     int innovation;

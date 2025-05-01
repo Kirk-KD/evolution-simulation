@@ -1,6 +1,6 @@
 package com.kirkkd.evolution.rendering;
 
-import com.kirkkd.evolution.util.Vec2f;
+import com.kirkkd.evolution.util.Vec2d;
 import com.kirkkd.evolution.window.IUpdateAction;
 import com.kirkkd.evolution.window.Window;
 
@@ -19,8 +19,8 @@ public class Camera implements IUpdateAction {
         instance = new Camera();
     }
 
-    private final Vec2f position = Vec2f.zero();
-    private Vec2f deltaPosition = Vec2f.zero();
+    private Vec2d position = Vec2d.zero();
+    private Vec2d deltaPosition = Vec2d.zero();
 
     protected Camera() {
         Window window = Window.getInstance();
@@ -36,18 +36,18 @@ public class Camera implements IUpdateAction {
 
     public void renderAllWithTranslation(List<IRenderAction> actions) {
         glPushMatrix();
-        glTranslatef(-position.getX(), -position.getY(), 0);
+        glTranslated(-position.x(), -position.y(), 0);
         actions.forEach(IRenderAction::render);
         glPopMatrix();
     }
 
-    public void setDeltaPosition(Vec2f deltaPosition) {
+    public void setDeltaPosition(Vec2d deltaPosition) {
         this.deltaPosition = deltaPosition;
     }
 
     @Override
     public void update() {
-        position.addInPlace(deltaPosition);
-        deltaPosition = Vec2f.zero();
+        position = position.add(deltaPosition);
+        deltaPosition = Vec2d.zero();
     }
 }

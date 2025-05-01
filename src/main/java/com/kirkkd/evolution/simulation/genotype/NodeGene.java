@@ -2,7 +2,7 @@ package com.kirkkd.evolution.simulation.genotype;
 
 import com.kirkkd.evolution.simulation.activation.IActivationFunction;
 
-public class NodeGene {
+public class NodeGene extends Gene {
     final int id;
 
     public int getId() {
@@ -25,12 +25,6 @@ public class NodeGene {
 
     public double getBias() {
         return bias;
-    }
-
-    boolean enabled = true;
-
-    public boolean isEnabled() {
-        return enabled;
     }
 
     public NodeGene(int id, NodeType type, IActivationFunction activation, double bias) {

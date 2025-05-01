@@ -4,6 +4,7 @@ import com.kirkkd.evolution.simulation.activation.IActivationFunction;
 import com.kirkkd.evolution.simulation.activation.Sigmoid;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Genome {
     List<NodeGene> nodes = new ArrayList<>();
@@ -16,6 +17,16 @@ public class Genome {
 
     public List<ConnectionGene> getConnections() {
         return connections;
+    }
+
+    Map<TraitGene.TraitType, TraitGene> traits = new HashMap<>();
+
+    public void addTrait(TraitGene trait) {
+        traits.put(trait.getType(), trait);
+    }
+
+    public TraitGene getTrait(TraitGene.TraitType traitType) {
+        return traits.get(traitType);
     }
 
     public void addNode(NodeGene node) {
@@ -67,9 +78,9 @@ public class Genome {
         return false;
     }
 
-    public static Genome generateRandomGenome(int numInputs, int numOutputs, int numHidden) {
+    public static Genome generateRandomGenome(int numInputs, int numHidden, int numOutputs, double traitEnableChance) {
         Genome genome = new Genome();
-        Random rand = new Random();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
         IActivationFunction actFn = new Sigmoid();
 
         int id = 0;
@@ -102,20 +113,35 @@ public class Genome {
             }
         }
 
+        for (TraitGene.TraitType traitType : TraitGene.TraitType.values()) {
+            genome.addTrait(new TraitGene(traitType, traitType.randomValue(), rand.nextDouble() < traitEnableChance));
+        }
+
         return genome;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Nodes:\n");
+
+        sb.append(String.format("Nodes (%s):\n", nodes.size()));
         for (NodeGene n : nodes) {
             sb.append(String.format("  ID %d | Type %s | Bias %.3f | Enabled %b\n", n.id, n.type, n.bias, n.enabled));
         }
-        sb.append("Connections:\n");
+
+        sb.append(String.format("Connections (%s):\n", connections.size()));
         connections.stream()
                 .sorted(Comparator.comparingInt(c -> c.from))
                 .forEach(c -> sb.append(String.format("  %d -> %d | Weight %.3f | Enabled %b | Innovation %d\n",
                         c.from, c.to, c.weight, c.enabled, c.innovation)));
+
+        sb.append(String.format("Traits (%s):\n", traits.size()));
+        traits.values().stream()
+                .sorted(Comparator.comparing(TraitGene::isEnabled).reversed())
+                .forEach(trait -> sb.append(String.format("  %s | Value %.3f | Enabled %b\n",
+                        trait.getType(),
+                        trait.getValue(),
+                        trait.isEnabled())));
+
         return sb.toString();
     }
 }

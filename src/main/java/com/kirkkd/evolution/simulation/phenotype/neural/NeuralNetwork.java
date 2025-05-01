@@ -1,4 +1,4 @@
-package com.kirkkd.evolution.simulation.phenotype;
+package com.kirkkd.evolution.simulation.phenotype.neural;
 
 import com.kirkkd.evolution.simulation.activation.IActivationFunction;
 import com.kirkkd.evolution.simulation.genotype.ConnectionGene;
