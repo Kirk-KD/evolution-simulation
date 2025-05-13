@@ -6,6 +6,7 @@ import com.kirkkd.evolution.simulation.Simulation;
 import com.kirkkd.evolution.window.Window;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 public class EvolutionSimulation {
     private Window window;
@@ -19,12 +20,13 @@ public class EvolutionSimulation {
     private void init() {
         DisplayManager.init();
 
-        Window.create(500, 500, "Evolution Simulation");
+        Window.create(1000, 1000, "Evolution Simulation");
         window = Window.getInstance();
         window.show();
 
         DisplayManager.createCapabilities();
         glEnable(GL_BLEND);
+        glEnable(GL_MULTISAMPLE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         Camera.create();
